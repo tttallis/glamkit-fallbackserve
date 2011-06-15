@@ -4,6 +4,8 @@ import urllib2
 import os
 from django.conf import settings
 
+from collection.templatetags.drugsquad import drugsquad
+
 
 class FallbackStorage(FileSystemStorage):
     def __init__(self, option=None):
@@ -42,7 +44,7 @@ class FallbackStorage(FileSystemStorage):
         fallback_server = settings.FALLBACK_STATIC_URL
         auth_user = getattr(settings, 'FALLBACK_STATIC_URL_USER', None)
         auth_pass = getattr(settings, 'FALLBACK_STATIC_URL_PASS', None)
-        fq_url = '%s%s' % (fallback_server, name)
+        fq_url = '%s%s' % (fallback_server, drugsquad(name))
         print "FallbackStorage: trying to fetch from %s" % fq_url
         try:
             handlers = []

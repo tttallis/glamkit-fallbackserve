@@ -3,6 +3,7 @@ from django.core.files.base import ContentFile
 import urllib2
 import os
 from django.conf import settings
+from itertools import imap
 
 from collection.templatetags.drugsquad import drugsquad
 
@@ -18,20 +19,19 @@ class FallbackStorage(FileSystemStorage):
             return super(FallbackStorage, self)._open(name, mode)
         except IOError, e:
             if e.errno == 2:
-                try:
-                    self.fetch_remote(name)
-                    # try again..
-                    return super(FallbackStorage, self)._open(name, mode)
-                except Exception, e2:
-                    raise e # raise outer error and pretend we didn't try this step
-            else:
-                raise
-
+                if any(imap(name.startswith, getattr(settings, 'FALLBACK_STATIC_PREFIXES', []))):
+                    try:
+                        self.fetch_remote(name)
+                        # try again..
+                        return super(FallbackStorage, self)._open(name, mode)
+                    except Exception, e2:
+                        raise e # raise outer error and pretend we didn't try this step
+            raise        
 
     def path(self, name):
         """you want my path, sure but i'll fetch it if it doesn't exist"""
         p = super(FallbackStorage, self).path(name)
-        if not self._fetching and not os.path.exists(p):
+        if not self._fetching and not os.path.exists(p) and any(imap(name.startswith, getattr(settings, 'FALLBACK_STATIC_PREFIXES', []))):
             try:
                 self.fetch_remote(name)
             except Exception, e:
@@ -45,7 +45,7 @@ class FallbackStorage(FileSystemStorage):
         auth_user = getattr(settings, 'FALLBACK_STATIC_URL_USER', None)
         auth_pass = getattr(settings, 'FALLBACK_STATIC_URL_PASS', None)
         fq_url = '%s%s' % (fallback_server, drugsquad(name))
-        print "FallbackStorage: trying to fetch from %s" % fq_url
+        print "FallbackStorage: trying to fatch from %s" % fq_url
         try:
             handlers = []
             if auth_user or auth_pass:

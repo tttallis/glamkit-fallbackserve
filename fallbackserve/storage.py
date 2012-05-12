@@ -45,7 +45,7 @@ class FallbackStorage(FileSystemStorage):
         auth_user = getattr(settings, 'FALLBACK_STATIC_URL_USER', None)
         auth_pass = getattr(settings, 'FALLBACK_STATIC_URL_PASS', None)
         fq_url = '%s%s' % (fallback_server, drugsquad(name))
-        print "FallbackStorage: trying to fatch from %s" % fq_url
+        print "FallbackStorage: trying to fetch from %s" % fq_url
         try:
             handlers = []
             if auth_user or auth_pass:

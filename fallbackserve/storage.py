@@ -5,7 +5,7 @@ import os
 from django.conf import settings
 from itertools import imap
 
-from collection.templatetags.drugsquad import drugsquad
+from sqlcollection.templatetags.drugsquad import drugsquad
 
 
 class FallbackStorage(FileSystemStorage):
